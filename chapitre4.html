@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapitre 4 – RSK : Contrôler les robots | RSK pour les nuls</title>
+  <meta name="description" content="Toutes les commandes RSK : goto, kick, control, leds, beep. Guide complet avec exemples.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo">⚽</div>
+    RSK <span>pour les nuls</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="chapitre1.html">Python bases</a></li>
+    <li><a href="chapitre2.html">Python OOP</a></li>
+    <li><a href="chapitre3.html">Le terrain</a></li>
+    <li><a href="chapitre4.html" class="active">Les robots</a></li>
+    <li><a href="chapitre5.html">Tactiques</a></li>
+    <li><a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener" class="btn btn-outline" style="padding:5px 12px;font-size:0.82rem;">Docs RSK ↗</a></li>
+  </ul>
+  <button class="hamburger" aria-label="Menu">☰</button>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-title">Chapitres</div>
+    <a href="index.html" class="sidebar-link"><span class="num">0</span>Accueil</a>
+    <a href="chapitre1.html" class="sidebar-link"><span class="num">1</span>Python : Les bases</a>
+    <a href="chapitre2.html" class="sidebar-link"><span class="num">2</span>Python : Objets</a>
+    <a href="chapitre3.html" class="sidebar-link"><span class="num">3</span>RSK : Le terrain</a>
+    <a href="chapitre4.html" class="sidebar-link active"><span class="num">4</span>RSK : Les robots</a>
+    <div class="sidebar-sub">
+      <a href="#connexion" class="sidebar-sub-link">Connexion</a>
+      <a href="#position" class="sidebar-sub-link">Position &amp; orientation</a>
+      <a href="#goto" class="sidebar-sub-link">goto() — se déplacer</a>
+      <a href="#kick" class="sidebar-sub-link">kick() — tirer</a>
+      <a href="#control" class="sidebar-sub-link">control() — vitesse</a>
+      <a href="#leds" class="sidebar-sub-link">leds() &amp; beep()</a>
+      <a href="#resume" class="sidebar-sub-link">Résumé des commandes</a>
+      <a href="#dynamique" class="sidebar-sub-link">Accès dynamique robots</a>
+      <a href="#arbitre" class="sidebar-sub-link">client.referee — l'arbitre</a>
+      <a href="#cote-auto" class="sidebar-sub-link">Changer de sens auto</a>
+    </div>
+    <a href="chapitre5.html" class="sidebar-link"><span class="num">5</span>Tactiques</a>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <div class="page-header">
+    <div class="chapter-badge">📖 Chapitre 4</div>
+    <h1 class="page-title">RSK : <span class="accent">Contrôler les robots</span></h1>
+    <p class="page-subtitle">
+      Connexion, déplacement, tir, vitesse, LEDs — toutes les commandes disponibles
+      dans la bibliothèque RSK expliquées avec des exemples concrets.
+    </p>
+  </div>
+
+  <!-- ──────────────────── 1. CONNEXION ──────────────────── -->
+  <h2 id="connexion">1. Se connecter au serveur</h2>
+
+  <p>
+    Tout programme RSK commence par <code>with rsk.Client(...) as client:</code>.
+    Les paramètres dépendent de si tu utilises le simulateur ou de vrais robots.
+  </p>
+
+  <div class="method-block">
+    <div class="method-sig">rsk.Client(host, key='')</div>
+    <div class="method-desc">Crée une connexion au serveur RSK (simulateur ou physique).</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">host</span><span class="param-type">str</span><span class="param-desc"><code>'localhost'</code> pour le simulateur local, ou l'IP de l'arbitre (ex : <code>'10.2.162.102'</code>)</span></div>
+      <div class="param-row"><span class="param-name">key</span><span class="param-type">str</span><span class="param-desc">Clé d'authentification (souvent vide <code>''</code> en cours)</span></div>
+    </div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> connexion.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+# ── Simulateur (sur ton ordi) ──────────────────────────────
+# Lance d'abord : python -m rsk.simulator
+with rsk.Client(host='localhost', key='') as client:
+    print("Connecté au simulateur !")
+    # ... ton code ici ...
+
+# ── Robot réel (IP de l'arbitre WiFi) ─────────────────────
+with rsk.Client(host='10.2.162.102', key='') as client:
+    print("Connecté aux robots réels !")
+    # ... ton code ici ...
+
+# Après le bloc "with", la connexion est automatiquement fermée.
+# Le programme principal s'arrête proprement.
+</code></pre>
+
+  <div class="callout robot">
+    <p>Pour travailler chez toi sans robots : lance le simulateur RSK avec
+    <code>python -m rsk.simulator</code> dans un terminal, puis exécute ton script dans un autre terminal.
+    Tu verras les robots se déplacer en temps réel dans la fenêtre du simulateur.</p>
+  </div>
+
+  <!-- ──────────────────── 2. POSITION ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="position">2. Connaître la position d'un robot</h2>
+
+  <p>
+    Chaque robot expose sa position via des <strong>attributs</strong>
+    (rappel : sans parenthèses !). Ces valeurs sont mises à jour en permanence
+    par le système de vision.
+  </p>
+
+  <div class="method-block">
+    <div class="method-sig">robot.position</div>
+    <div class="method-desc">Retourne un tuple <code>(x, y)</code> en mètres, ou <code>None</code> si le robot n'est pas visible.</div>
+  </div>
+  <div class="method-block">
+    <div class="method-sig">robot.orientation</div>
+    <div class="method-desc">Retourne l'angle en radians, ou <code>None</code> si non visible.</div>
+  </div>
+  <div class="method-block">
+    <div class="method-sig">robot.pose</div>
+    <div class="method-desc">Retourne le tuple complet <code>(x, y, angle)</code>, ou <code>None</code>.</div>
+  </div>
+  <div class="method-block">
+    <div class="method-sig">robot.age()</div>
+    <div class="method-desc">Secondes depuis la dernière détection. Valeur élevée = robot peut-être caché.</div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> position_robot.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+import math
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        # ── Position (x, y) ───────────────────────────────
+        pos = client.green1.position
+        if pos is not None:
+            x, y = pos
+            print(f"Vert 1 → x={x:.3f} m, y={y:.3f} m")
+
+        # ── Orientation (angle) ───────────────────────────
+        angle = client.green1.orientation
+        if angle is not None:
+            deg = math.degrees(angle)
+            print(f"Vert 1 → angle={angle:.3f} rad ({deg:.1f}°)")
+
+        # ── Pose complète (x, y, angle) ───────────────────
+        pose = client.green1.pose
+        if pose is not None:
+            x, y, theta = pose
+
+        # ── X et Y séparément ─────────────────────────────
+        # Dans les codes d'équipe, on accède souvent directement :
+        xg1 = client.green1.position[0]   # x du robot vert 1
+        yg1 = client.green1.position[1]   # y du robot vert 1
+        xg2 = client.green2.position[0]   # x du robot vert 2
+</code></pre>
+
+  <!-- ──────────────────── 3. GOTO ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="goto">3. <code>goto()</code> — Se déplacer vers un point</h2>
+
+  <p>
+    C'est la commande la plus utilisée dans RSK. Tu donnes une destination
+    <code>(x, y, angle)</code> et le robot s'y rend en évitant (parfois) les obstacles.
+  </p>
+
+  <div class="method-block">
+    <div class="method-sig">robot.goto(target, wait=True, avoid_obstacles=False)</div>
+    <div class="method-desc">Envoie le robot vers la position cible. Retourne <code>True</code> quand le robot est arrivé.</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">target</span><span class="param-type">tuple</span><span class="param-desc">Tuple <code>(x, y, angle)</code> ou fonction retournant ce tuple</span></div>
+      <div class="param-row"><span class="param-name">wait</span><span class="param-type">bool</span><span class="param-desc"><code>True</code> = bloque jusqu'à l'arrivée. <code>False</code> = retourne immédiatement (mode réactif)</span></div>
+      <div class="param-row"><span class="param-name">avoid_obstacles</span><span class="param-type">bool</span><span class="param-desc"><code>True</code> = essaie d'éviter les autres robots</span></div>
+    </div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> goto.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+
+    # ── wait=True : bloque jusqu'à l'arrivée ─────────────
+    # ⚠️ La boucle while s'arrête ici jusqu'à ce que le robot arrive !
+    client.green1.goto((0.3, 0.0, radians(180)))
+    print("Arrivé !")
+
+    # ── wait=False : retourne immédiatement ───────────────
+    # ✅ Recommandé dans une boucle while True pour rester réactif
+    while True:
+        if client.ball is not None:
+            bx, by = client.ball
+
+            # Se placer derrière la balle (x + offset) pour tirer
+            arrive = client.green1.goto(
+                (bx + 0.08, by, radians(180)),
+                wait=False
+            )
+
+            # arrive == True quand le robot est à destination
+            if arrive:
+                client.green1.kick()
+</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Résumé :</strong> Dans une boucle <code>while True</code>, utilise toujours
+    <code>wait=False</code>. Utilise <code>wait=True</code> seulement pour une séquence linéaire
+    (robot qui exécute des étapes l'une après l'autre).</p>
+  </div>
+
+  <h3>Suivre une cible dynamique</h3>
+  <p>
+    Si la cible change en permanence (comme la balle), passe une <strong>fonction lambda</strong>
+    comme target :
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> goto_dynamique.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        if client.ball is not None:
+            # Lambda recalculée à chaque appel → cible toujours à jour
+            client.green1.goto(
+                lambda: (client.ball[0] + 0.08, client.ball[1], radians(180)),
+                wait=False
+            )
+</code></pre>
+
+  <!-- ──────────────────── 4. KICK ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="kick">4. <code>kick()</code> — Tirer dans la balle</h2>
+
+  <div class="method-block">
+    <div class="method-sig">robot.kick(power=1.0)</div>
+    <div class="method-desc">Active le mécanisme de tir du robot. Le tir s'effectue vers l'avant du robot.</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">power</span><span class="param-type">float</span><span class="param-desc">Puissance du tir, de <code>0</code> (faible) à <code>1</code> (maximum). Par défaut : <code>1</code>.</span></div>
+    </div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> kick.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        if client.ball is not None:
+            bx, by = client.ball
+            xg2 = client.green2.position[0]
+
+            # ── Se placer derrière la balle PUIS tirer ────
+            if client.green1.goto((bx + 0.05, by, radians(180)), wait=False):
+                # True = robot arrivé → TIRER !
+                client.green1.kick(1)    # tir à pleine puissance
+
+            # ── Tir dégagement (défenseur) ────────────────
+            # Balle dans la zone de but → dégager immédiatement
+            if bx > 0.60 and abs(by) < 0.30:
+                client.green2.goto((bx + 0.07, by, radians(180)), wait=False)
+                client.green2.kick()     # kick() sans argument = power=1
+                client.green2.kick()     # double kick pour plus de force
+
+            # ── Tir précis (attaquant, puissance partielle) ─
+            client.green1.kick(0.5)   # tir à mi-puissance pour la précision
+</code></pre>
+
+  <div class="callout robot">
+    <p>Le robot doit être <strong>orienté dans la bonne direction</strong> pour que le tir soit efficace.
+    <code>goto((bx + offset, by, angle))</code> place le robot derrière la balle,
+    faisant face à la direction de tir.</p>
+  </div>
+
+  <h3>Pourquoi double kick ?</h3>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> double_kick.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># Dans les codes d'équipe, on voit souvent :
+client.green1.kick(1)
+client.green1.kick()
+
+# Pourquoi deux fois ?
+# → La première commande "prépare" le système de tir.
+# → La deuxième déclenche le tir.
+# → Sur certains robots ou selon le timing, doubler
+#   la commande améliore la fiabilité du tir.
+# → C'est une bonne pratique quand le robot est en position.
+</code></pre>
+
+  <!-- ──────────────────── 5. CONTROL ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="control">5. <code>control()</code> — Contrôle en vitesse</h2>
+
+  <p>
+    Contrairement à <code>goto()</code> qui gère automatiquement le déplacement,
+    <code>control()</code> te laisse contrôler les <strong>vitesses directement</strong>.
+    C'est le contrôle bas-niveau.
+  </p>
+
+  <div class="method-block">
+    <div class="method-sig">robot.control(dx, dy, dturn)</div>
+    <div class="method-desc">Contrôle les vitesses du robot dans son repère propre (pas le repère du terrain).</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">dx</span><span class="param-type">float</span><span class="param-desc">Vitesse vers l'avant du robot [m/s]. Positif = avance, négatif = recule.</span></div>
+      <div class="param-row"><span class="param-name">dy</span><span class="param-type">float</span><span class="param-desc">Vitesse latérale [m/s]. Positif = va à gauche du robot.</span></div>
+      <div class="param-row"><span class="param-name">dturn</span><span class="param-type">float</span><span class="param-desc">Vitesse de rotation [rad/s]. Positif = tourne à gauche.</span></div>
+    </div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> control.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+with rsk.Client(host='localhost', key='') as client:
+
+    # ── Avancer tout droit à 0.3 m/s ─────────────────────
+    client.green1.control(0.3, 0.0, 0.0)
+
+    # ── Reculer ───────────────────────────────────────────
+    client.green1.control(-0.2, 0.0, 0.0)
+
+    # ── Se déplacer latéralement ──────────────────────────
+    client.green1.control(0.0, 0.2, 0.0)
+
+    # ── Tourner sur place (sens anti-horaire) ─────────────
+    client.green1.control(0.0, 0.0, 1.0)
+
+    # ── S'arrêter ─────────────────────────────────────────
+    client.green1.control(0.0, 0.0, 0.0)
+
+    # ⚠️ ATTENTION : control() est dans le repère du ROBOT,
+    # pas dans le repère du terrain !
+    # Si le robot regarde vers la gauche, dx=0.3 le fait aller VERS LA GAUCHE,
+    # pas vers la droite !
+</code></pre>
+
+  <div class="callout info">
+    <p><code>control()</code> est utile pour des comportements fins (glissement latéral, freinage)
+    mais <code>goto()</code> est généralement plus simple et plus facile à utiliser
+    pour les déplacements vers un point.</p>
+  </div>
+
+  <!-- ──────────────────── 6. LEDS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="leds">6. <code>leds()</code> &amp; <code>beep()</code> — Effets et son</h2>
+
+  <div class="method-block">
+    <div class="method-sig">robot.leds(r, g, b)</div>
+    <div class="method-desc">Change la couleur des LEDs du robot.</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">r</span><span class="param-type">int</span><span class="param-desc">Canal rouge, de 0 à 255</span></div>
+      <div class="param-row"><span class="param-name">g</span><span class="param-type">int</span><span class="param-desc">Canal vert, de 0 à 255</span></div>
+      <div class="param-row"><span class="param-name">b</span><span class="param-type">int</span><span class="param-desc">Canal bleu, de 0 à 255</span></div>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-sig">robot.beep(frequency, duration)</div>
+    <div class="method-desc">Fait émettre un son au robot.</div>
+    <div class="method-params">
+      <div class="param-row"><span class="param-name">frequency</span><span class="param-type">int</span><span class="param-desc">Fréquence en Hz (ex : 440 = La, 523 = Do, 880 = La aigu)</span></div>
+      <div class="param-row"><span class="param-name">duration</span><span class="param-type">int</span><span class="param-desc">Durée en millisecondes (ex : 200 = court, 1000 = 1 seconde)</span></div>
+    </div>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> leds_beep.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+import time
+
+with rsk.Client(host='localhost', key='') as client:
+
+    # ── LEDs de différentes couleurs ──────────────────────
+    client.green1.leds(255, 0,   0)    # rouge
+    client.green1.leds(0,   255, 0)    # vert
+    client.green1.leds(0,   0,   255)  # bleu
+    client.green1.leds(255, 127, 0)    # orange
+    client.green1.leds(255, 255, 255)  # blanc
+    client.green1.leds(0,   0,   0)    # éteint
+
+    # ── Beep ──────────────────────────────────────────────
+    client.green1.beep(440, 200)    # La 440 Hz, 200 ms
+    client.green1.beep(523, 300)    # Do, 300 ms
+    client.green1.beep(659, 300)    # Mi, 300 ms
+    client.green1.beep(784, 500)    # Sol, 500 ms
+
+    # ── Exemple pratique : signaler qu'on a marqué un but ─
+    def celebrer_but():
+        # LEDs clignotent et bruit de fanfare
+        for _ in range(3):
+            client.green1.leds(255, 200, 0)   # jaune/or
+            client.green1.beep(1047, 150)      # Do aigu
+            time.sleep(0.2)
+            client.green1.leds(0, 0, 0)
+            time.sleep(0.1)
+</code></pre>
+
+  <!-- ──────────────────── 7. RÉSUMÉ ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="resume">7. Résumé de toutes les commandes</h2>
+
+  <table>
+    <thead><tr><th>Commande</th><th>Type</th><th>Description rapide</th></tr></thead>
+    <tbody>
+      <tr><td>client.ball</td><td>attribut</td><td>Position balle <code>(x,y)</code> ou <code>None</code></td></tr>
+      <tr><td>robot.position</td><td>attribut</td><td>Position robot <code>(x,y)</code> ou <code>None</code></td></tr>
+      <tr><td>robot.orientation</td><td>attribut</td><td>Angle en radians ou <code>None</code></td></tr>
+      <tr><td>robot.pose</td><td>attribut</td><td>Tuple complet <code>(x,y,angle)</code> ou <code>None</code></td></tr>
+      <tr><td>robot.age()</td><td>méthode</td><td>Secondes depuis la dernière détection</td></tr>
+      <tr><td>robot.goto(target, wait)</td><td>méthode</td><td>Se déplacer vers <code>(x,y,angle)</code></td></tr>
+      <tr><td>robot.kick(power)</td><td>méthode</td><td>Tirer (power 0–1, défaut 1)</td></tr>
+      <tr><td>robot.control(dx, dy, dturn)</td><td>méthode</td><td>Contrôle vitesse bas-niveau</td></tr>
+      <tr><td>robot.leds(r, g, b)</td><td>méthode</td><td>Couleur LEDs (0–255 par canal)</td></tr>
+      <tr><td>robot.beep(freq, dur)</td><td>méthode</td><td>Son (Hz, ms)</td></tr>
+      <tr><td>robot.teleport(x, y, a)</td><td>méthode</td><td>Téléporte (simulateur uniquement)</td></tr>
+      <tr><td>client.robots[couleur][num]</td><td>attribut</td><td>Accès dynamique à un robot par couleur et numéro</td></tr>
+      <tr><td>client.referee</td><td>attribut</td><td>Dictionnaire arbitre : état du match, scores, pénalités, côté</td></tr>
+      <tr><td>client.referee["teams"][c]["x_positive"]</td><td>bool</td><td><code>True</code> si l'équipe <em>c</em> joue côté X+ (but droit)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> programme_complet_minimal.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">"""
+Programme minimal RSK — contrôle les deux robots verts.
+Vert 2 défend, Vert 1 attaque.
+"""
+import rsk
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        try:
+            balle = client.ball
+            if balle is None:
+                continue        # Balle non visible, rien à faire
+
+            bx, by = balle
+
+            # ── Défenseur (green2) : se placer devant le but ──
+            if abs(by) < 0.30:
+                client.green2.goto((0.80, by, radians(180)), wait=False)
+                # Tirer si la balle est dans la zone de but
+                if bx > 0.60:
+                    client.green2.kick()
+            elif by > 0:
+                client.green2.goto((0.80, 0.30, radians(180)), wait=False)
+            else:
+                client.green2.goto((0.80, -0.30, radians(180)), wait=False)
+
+            # ── Attaquant (green1) : foncer sur la balle ──────
+            if client.green1.goto((bx + 0.05, by, radians(180)), wait=False):
+                client.green1.kick()
+
+        except Exception:
+            pass    # Ignorer les erreurs transitoires
+</code></pre>
+
+  <!-- ──────────────────── 8. ACCÈS DYNAMIQUE ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="dynamique">8. Accès dynamique aux robots</h2>
+
+  <p>
+    Les raccourcis <code>client.green1</code>, <code>client.green2</code>, etc. sont pratiques, mais ils sont
+    <strong>figés</strong> : la couleur est écrite en dur dans le code. Pour écrire un programme qui
+    s'adapte automatiquement (peu importe si vous jouez en vert ou en bleu), il faut utiliser la
+    syntaxe <em>dynamique</em> :
+  </p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">client.robots</span>
+      <span class="method-type">dict</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Dictionnaire de tous les robots, indexé par couleur puis par numéro.</p>
+      <table>
+        <thead><tr><th>Accès</th><th>Équivalent raccourci</th></tr></thead>
+        <tbody>
+          <tr><td><code>client.robots['green'][1]</code></td><td><code>client.green1</code></td></tr>
+          <tr><td><code>client.robots['green'][2]</code></td><td><code>client.green2</code></td></tr>
+          <tr><td><code>client.robots['blue'][1]</code></td><td><code>client.blue1</code></td></tr>
+          <tr><td><code>client.robots['blue'][2]</code></td><td><code>client.blue2</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p>
+    Avec cette syntaxe, vous pouvez stocker la couleur dans une variable et ne changer
+    <strong>qu'un seul endroit</strong> dans votre code pour jouer avec l'autre équipe :
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> acces_dynamique.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+# ← Une seule ligne à changer pour passer en équipe bleue
+MA_COULEUR = 'green'
+
+with rsk.Client() as client:
+    # Accès par variable : aucun "green" en dur dans le reste du code
+    defenseur = client.robots[MA_COULEUR][2]
+    attaquant = client.robots[MA_COULEUR][1]
+
+    while True:
+        balle = client.ball
+        if balle is None:
+            continue
+
+        bx, by = balle
+        attaquant.goto((bx, by, 0), wait=False)
+</code></pre>
+
+  <p>
+    Vous pouvez aussi <strong>parcourir tous vos robots</strong> en boucle, utile pour allumer les LEDs
+    ou envoyer une commande à toute l'équipe :
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> boucle_equipe.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+MA_COULEUR = 'green'
+
+with rsk.Client() as client:
+    # Allumer tous les robots de l'équipe en rouge
+    for numero, robot in client.robots[MA_COULEUR].items():
+        robot.leds(255, 0, 0)
+
+    # Ou parcourir TOUTES les couleurs et TOUS les numéros
+    for couleur in client.robots:               # 'green', 'blue'
+        for numero in client.robots[couleur]:   # 1, 2
+            print(couleur, numero, client.robots[couleur][numero].position)
+</code></pre>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">💡 Bonne pratique</div>
+    <p>
+      Placez toujours <code>MA_COULEUR = 'green'</code> tout en haut du fichier. Ainsi, le reste
+      du code n'a jamais la couleur en dur, et changer d'équipe ne prend qu'une seconde.
+    </p>
+  </div>
+
+  <!-- ──────────────────── 9. CLIENT.REFEREE ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="arbitre">9. <code>client.referee</code> — les informations de l'arbitre</h2>
+
+  <p>
+    Pendant un match, le Game Controller maintient un état de jeu complet. Votre programme
+    peut le lire à tout moment via <code>client.referee</code>, qui est un <strong>dictionnaire Python</strong>
+    mis à jour en temps réel.
+  </p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">ℹ️ Type : dictionnaire</div>
+    <p>
+      <code>client.referee</code> peut valoir <code>None</code> si aucun Game Controller n'a encore
+      répondu. Pensez à vérifier avant d'y accéder.
+    </p>
+  </div>
+
+  <h3>Structure complète du dictionnaire</h3>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> structure_referee.py (exemple de contenu)</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">{
+    # ── État global du match ─────────────────────────────────────
+    "game_is_running":     True,   # Le match a été démarré (bouton "Start")
+    "game_paused":         False,  # Jeu en pause (placement de balle, mi-temps…)
+    "halftime_is_running": False,  # True pendant la mi-temps
+    "timer":               240,    # Temps restant en secondes (arrondi au plafond)
+    "game_state_msg":      "Game is running...",  # Message lisible de l'état
+
+    # ── Équipes ──────────────────────────────────────────────────
+    "teams": {
+        "green": {
+            "name":       "Les verts FC",  # Nom de l'équipe (saisi dans le GC)
+            "score":      1,               # Score actuel
+            "x_positive": True,            # True → vert joue côté X positif (+0.92 m)
+            "robots": {
+                "1": {
+                    "penalized":           False,  # Robot pénalisé ?
+                    "penalized_remaining": None,   # Temps de pénalité restant (s) ou None
+                    "penalized_reason":    None,   # Raison (ex: "ball_abuse")
+                    "preempted":           False,  # Contrôlé par le referee ?
+                    "preemption_reasons":  [],     # Liste des raisons de préemption
+                },
+                "2": { ... }  # Même structure pour le robot 2
+            }
+        },
+        "blue": {
+            "name":       "Blue Stars",
+            "score":      0,
+            "x_positive": False,  # bleu est du côté X négatif (−0.92 m)
+            "robots": { "1": { ... }, "2": { ... } }
+        }
+    },
+
+    # ── Historique des événements arbitraux ──────────────────────
+    "referee_history_sliced": [
+        "goal",
+        "sideline-crossed",
+        "penalty-green1",
+        ...
+    ]
+}
+</code></pre>
+
+  <h3>Tableau des champs clés</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Accès</th>
+        <th>Type</th>
+        <th>Signification</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>client.referee["game_is_running"]</code></td>
+        <td><code>bool</code></td>
+        <td>Le match a-t-il été lancé (bouton "Start Game") ?</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["game_paused"]</code></td>
+        <td><code>bool</code></td>
+        <td>Jeu momentanément en pause (remise en jeu, mi-temps…)</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["halftime_is_running"]</code></td>
+        <td><code>bool</code></td>
+        <td><code>True</code> pendant la mi-temps — robots bloqués</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["timer"]</code></td>
+        <td><code>int</code></td>
+        <td>Temps restant en secondes (5 min par défaut = 300 s)</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["game_state_msg"]</code></td>
+        <td><code>str</code></td>
+        <td>Message d'état lisible : <em>"Game is running…"</em>, <em>"Place the ball on the dot"</em>…</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["score"]</code></td>
+        <td><code>int</code></td>
+        <td>Score de l'équipe verte</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["name"]</code></td>
+        <td><code>str</code></td>
+        <td>Nom de l'équipe verte (configuré dans le Game Controller)</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["x_positive"]</code></td>
+        <td><code>bool</code></td>
+        <td><strong>Clé cruciale :</strong> <code>True</code> → vert joue du côté X + (derrière x ≈ +0.92 m). Voir section suivante.</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["robots"]["1"]["penalized"]</code></td>
+        <td><code>bool</code></td>
+        <td>Le robot vert 1 est-il pénalisé (expulsé temporairement) ?</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["robots"]["1"]["penalized_remaining"]</code></td>
+        <td><code>int | None</code></td>
+        <td>Secondes de pénalité restantes, ou <code>None</code> si pas pénalisé</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["robots"]["1"]["penalized_reason"]</code></td>
+        <td><code>str | None</code></td>
+        <td>Raison : <code>"ball_abuse"</code>, <code>"abusive_defense"</code>, <code>"abusive_attack"</code>…</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["robots"]["1"]["preempted"]</code></td>
+        <td><code>bool</code></td>
+        <td>Vrai si l'arbitre a pris le contrôle du robot (vous ne pouvez plus le piloter)</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["teams"]["green"]["robots"]["1"]["preemption_reasons"]</code></td>
+        <td><code>list[str]</code></td>
+        <td>Liste des raisons : <code>"game-start"</code>, <code>"half-time"</code>, <code>"sideline-crossed"</code>…</td>
+      </tr>
+      <tr>
+        <td><code>client.referee["referee_history_sliced"]</code></td>
+        <td><code>list[str]</code></td>
+        <td>Derniers événements arbitraux (buts, sorties, pénalités…)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">⚠️ Clés numéros : chaînes de caractères !</div>
+    <p>
+      Les numéros de robots sont des <strong>chaînes</strong> dans le JSON : utilisez
+      <code>"1"</code> et <code>"2"</code> (avec guillemets), pas des entiers.
+    </p>
+    <pre style="margin-top:8px;"><code class="language-python"># ✅ Correct
+penalise = client.referee["teams"]["green"]["robots"]["1"]["penalized"]
+
+# ❌ Faux — KeyError !
+penalise = client.referee["teams"]["green"]["robots"][1]["penalized"]
+</code></pre>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> lire_arbitre.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+with rsk.Client() as client:
+    ref = client.referee   # raccourci local
+    if ref is None:
+        print("Pas encore de données arbitre")
+    else:
+        print("Match lancé :", ref["game_is_running"])
+        print("Temps restant :", ref["timer"], "s")
+        print("Score vert :", ref["teams"]["green"]["score"])
+        print("Score bleu :", ref["teams"]["blue"]["score"])
+
+        # Vérifier si robot vert 1 est pénalisé
+        if ref["teams"]["green"]["robots"]["1"]["penalized"]:
+            reste = ref["teams"]["green"]["robots"]["1"]["penalized_remaining"]
+            print(f"Robot vert 1 pénalisé — encore {reste}s")
+</code></pre>
+
+  <!-- ──────────────────── 10. SENS AUTO ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="cote-auto">10. Changer de sens automatiquement</h2>
+
+  <p>
+    Dans le chapitre 5, vous avez deux fichiers séparés (<em>green vers−</em> et <em>green vers+</em>)
+    selon que votre but à défendre est à droite (+X) ou à gauche (−X). Grâce à
+    <code>client.referee</code> et à l'accès dynamique, un seul programme peut <strong>détecter
+    automatiquement son côté</strong> et adapter tous ses calculs.
+  </p>
+
+  <h3>Le champ <code>x_positive</code></h3>
+
+  <p>
+    L'arbitre maintient, pour chaque équipe, un champ <code>x_positive</code> qui indique
+    de quel côté du terrain elle se trouve en début de match :
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th><code>x_positive</code> (vert)</th>
+        <th>Position défensive</th>
+        <th>But à défendre</th>
+        <th>Correspond à</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>True</code></td>
+        <td>x ≈ +0.80 m (droite)</td>
+        <td>But droit (x ≈ +0.92 m)</td>
+        <td><em>green vers−</em></td>
+      </tr>
+      <tr>
+        <td><code>False</code></td>
+        <td>x ≈ −0.80 m (gauche)</td>
+        <td>But gauche (x ≈ −0.92 m)</td>
+        <td><em>green vers+</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> auto_cote.py — programme qui s'adapte tout seul</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">"""
+Programme RSK qui détecte automatiquement son côté grâce à client.referee.
+Une seule variable MA_COULEUR à changer pour jouer en bleu.
+"""
+import rsk
+from math import radians, pi
+
+MA_COULEUR = 'green'   # ← seul endroit à modifier
+
+with rsk.Client() as client:
+
+    # ── Attendre les infos de l'arbitre ─────────────────────────
+    while client.referee is None:
+        pass   # patience le temps de la première mise à jour
+
+    # ── Déterminer le côté une fois pour toutes ──────────────────
+    x_positif = client.referee["teams"][MA_COULEUR]["x_positive"]
+
+    if x_positif:
+        # Mon équipe est côté X+ → je défends le but de droite
+        x_defenseur  =  0.80      # position défensive (en coordonnées terrain)
+        angle_face   = radians(180)  # face vers la gauche (vers le terrain)
+        signe_attaque = -1           # j'attaque vers X−
+    else:
+        # Mon équipe est côté X− → je défends le but de gauche
+        x_defenseur  = -0.80
+        angle_face   = radians(0)    # face vers la droite
+        signe_attaque = +1           # j'attaque vers X+
+
+    defenseur = client.robots[MA_COULEUR][2]
+    attaquant  = client.robots[MA_COULEUR][1]
+
+    # ── Boucle principale ────────────────────────────────────────
+    while True:
+        try:
+            balle = client.ball
+            if balle is None:
+                continue
+
+            bx, by = balle
+
+            # Défenseur : se placer devant son but, suivre Y de la balle
+            by_clamp = max(-0.30, min(0.30, by))
+            defenseur.goto((x_defenseur, by_clamp, angle_face), wait=False)
+
+            # Expulser la balle si elle est trop proche du but
+            if abs(bx - x_defenseur) < 0.20:
+                defenseur.kick()
+
+            # Attaquant : foncer sur la balle puis tirer
+            if attaquant.goto((bx + signe_attaque * 0.05, by, angle_face), wait=False):
+                attaquant.kick()
+
+        except Exception:
+            pass
+</code></pre>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">💡 Pourquoi <code>signe_attaque * 0.05</code> ?</div>
+    <p>
+      On demande au robot de se placer légèrement <em>derrière</em> la balle (côté opposé au but
+      adverse) pour qu'il lui fasse face. Le signe (±1) est déterminé automatiquement selon
+      le côté détecté.
+    </p>
+  </div>
+
+  <h3>Lire le côté pendant le match (après mi-temps)</h3>
+
+  <p>
+    Dans certaines compétitions, les équipes <strong>changent de côté à la mi-temps</strong>.
+    Pour gérer ce cas, il suffit de relire <code>x_positive</code> à chaque tour de boucle
+    (plutôt qu'une seule fois) :
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> cote_dynamique_boucle.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+from math import radians
+
+MA_COULEUR = 'green'
+
+with rsk.Client() as client:
+    while True:
+        try:
+            ref = client.referee
+            if ref is None:
+                continue
+
+            # Recalculer le côté à chaque itération → mi-temps gérée automatiquement
+            x_positif = ref["teams"][MA_COULEUR]["x_positive"]
+            x_def   =  0.80 if x_positif else -0.80
+            angle   = radians(180) if x_positif else radians(0)
+            signe   = -1 if x_positif else +1
+
+            balle = client.ball
+            if balle is None:
+                continue
+
+            bx, by = balle
+            client.robots[MA_COULEUR][2].goto(
+                (x_def, max(-0.30, min(0.30, by)), angle), wait=False
+            )
+            if client.robots[MA_COULEUR][1].goto(
+                (bx + signe * 0.05, by, angle), wait=False
+            ):
+                client.robots[MA_COULEUR][1].kick()
+
+        except Exception:
+            pass
+</code></pre>
+
+  <!-- PAGE NAV -->
+  <div class="page-nav">
+    <a href="chapitre3.html" class="page-nav-btn">
+      <span class="nav-arrow">←</span>
+      <div>
+        <div class="nav-label">Précédent</div>
+        <div class="nav-title">RSK : Le terrain</div>
+      </div>
+    </a>
+    <span class="page-nav-spacer"></span>
+    <a href="chapitre5.html" class="page-nav-btn">
+      <div style="text-align:right;">
+        <div class="nav-label">Suivant</div>
+        <div class="nav-title">Tactiques : Défenseur &amp; Attaquant</div>
+      </div>
+      <span class="nav-arrow">→</span>
+    </a>
+  </div>
+
+</main>
+</div>
+
+<footer>
+  <span>RSK pour les nuls · Chapitre 4 — Contrôler les robots</span>
+  <span><a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener">robot-soccer-kit.github.io</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapitre 3 – RSK : Le terrain | RSK pour les nuls</title>
+  <meta name="description" content="Comprendre le terrain RSK : dimensions, coordonnées, zones, angles et balle.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo">⚽</div>
+    RSK <span>pour les nuls</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="chapitre1.html">Python bases</a></li>
+    <li><a href="chapitre2.html">Python OOP</a></li>
+    <li><a href="chapitre3.html" class="active">Le terrain</a></li>
+    <li><a href="chapitre4.html">Les robots</a></li>
+    <li><a href="chapitre5.html">Tactiques</a></li>
+    <li><a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener" class="btn btn-outline" style="padding:5px 12px;font-size:0.82rem;">Docs RSK ↗</a></li>
+  </ul>
+  <button class="hamburger" aria-label="Menu">☰</button>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-title">Chapitres</div>
+    <a href="index.html" class="sidebar-link"><span class="num">0</span>Accueil</a>
+    <a href="chapitre1.html" class="sidebar-link"><span class="num">1</span>Python : Les bases</a>
+    <a href="chapitre2.html" class="sidebar-link"><span class="num">2</span>Python : Objets</a>
+    <a href="chapitre3.html" class="sidebar-link active"><span class="num">3</span>RSK : Le terrain</a>
+    <div class="sidebar-sub">
+      <a href="#dimensions" class="sidebar-sub-link">Dimensions</a>
+      <a href="#coordonnees" class="sidebar-sub-link">Système de coordonnées</a>
+      <a href="#zones" class="sidebar-sub-link">Zones importantes</a>
+      <a href="#angles" class="sidebar-sub-link">Angles &amp; radians</a>
+      <a href="#balle" class="sidebar-sub-link">La balle</a>
+      <a href="#cotes" class="sidebar-sub-link">Quelle équipe où ?</a>
+    </div>
+    <a href="chapitre4.html" class="sidebar-link"><span class="num">4</span>RSK : Les robots</a>
+    <a href="chapitre5.html" class="sidebar-link"><span class="num">5</span>Tactiques</a>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <div class="page-header">
+    <div class="chapter-badge">📖 Chapitre 3</div>
+    <h1 class="page-title">RSK : <span class="accent">Le terrain</span></h1>
+    <p class="page-subtitle">
+      Avant de programmer tes robots, tu dois connaître le terrain comme ta poche.
+      Dimensions, coordonnées, zones, angles — tout est ici.
+    </p>
+  </div>
+
+  <!-- ──────────────────── 1. DIMENSIONS ──────────────────── -->
+  <h2 id="dimensions">1. Dimensions du terrain</h2>
+
+  <p>
+    Le terrain RSK (la zone de jeu) mesure <strong>1,84 m × 1,23 m</strong>.
+    Il est posé sur un tapis vert plus grand de <strong>2,45 m × 1,84 m</strong>
+    qui laisse une bordure de 30 cm tout autour — nécessaire pour les caméras.
+  </p>
+
+  <table>
+    <thead><tr><th>Élément</th><th>Largeur (X)</th><th>Hauteur (Y)</th></tr></thead>
+    <tbody>
+      <tr><td>Terrain de jeu</td><td>1,84 m</td><td>1,23 m</td></tr>
+      <tr><td>Tapis complet</td><td>2,45 m</td><td>1,84 m</td></tr>
+      <tr><td>Largeur d'un but</td><td>—</td><td>0,60 m</td></tr>
+      <tr><td>Zone de défense</td><td>0,30 m</td><td>0,90 m</td></tr>
+      <tr><td>Robot (diamètre)</td><td>≈ 7 cm</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SVG TERRAIN -->
+  <h2 id="coordonnees">2. Système de coordonnées</h2>
+
+  <p>
+    L'<strong>origine (0, 0)</strong> est au centre du terrain.
+    L'axe <span class="hl-green">X</span> est horizontal (de gauche à droite),
+    l'axe <span class="hl-blue">Y</span> est vertical (de bas en haut).
+    Tout est en <strong>mètres</strong>.
+  </p>
+
+  <div class="field-container">
+    <svg viewBox="-500 -350 1000 700" width="100%" style="max-width:780px;display:block;margin:0 auto;" aria-label="Terrain RSK avec coordonnées">
+      <!-- Fond terrain -->
+      <rect x="-460" y="-315" width="920" height="630" rx="4" fill="#1a3a1a" stroke="#2d5a2d" stroke-width="1"/>
+      <!-- Tapis (zone plus grande) -->
+      <rect x="-460" y="-315" width="920" height="630" fill="#1e4020"/>
+
+      <!-- Terrain de jeu -->
+      <rect x="-368" y="-246" width="736" height="492" fill="#246b24" stroke="white" stroke-width="3"/>
+
+      <!-- Ligne centrale -->
+      <line x1="0" y1="-246" x2="0" y2="246" stroke="white" stroke-width="2.5"/>
+
+      <!-- Cercle central -->
+      <circle cx="0" cy="0" r="80" fill="none" stroke="white" stroke-width="2.5"/>
+      <!-- Point central -->
+      <circle cx="0" cy="0" r="6" fill="white"/>
+
+      <!-- But gauche (BLEU) -->
+      <rect x="-408" y="-120" width="40" height="240" fill="none" stroke="#60a5fa" stroke-width="3"/>
+      <!-- But droit (VERT) -->
+      <rect x="368" y="-120" width="40" height="240" fill="none" stroke="#4ade80" stroke-width="3"/>
+
+      <!-- Zone de défense gauche -->
+      <rect x="-368" y="-180" width="120" height="360" fill="rgba(96,165,250,0.08)" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- Zone de défense droite -->
+      <rect x="248" y="-180" width="120" height="360" fill="rgba(74,222,128,0.08)" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+      <!-- Points de dot (coins) -->
+      <circle cx="-180" cy="-122" r="5" fill="white"/>
+      <circle cx="-180" cy="122" r="5" fill="white"/>
+      <circle cx="180" cy="-122" r="5" fill="white"/>
+      <circle cx="180" cy="122" r="5" fill="white"/>
+
+      <!-- ── Axes ── -->
+      <!-- Axe X -->
+      <line x1="-460" y1="0" x2="460" y2="0" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="8,6"/>
+      <!-- Axe Y -->
+      <line x1="0" y1="-335" x2="0" y2="335" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="8,6"/>
+
+      <!-- Flèche axe X -->
+      <defs>
+        <marker id="arrowX" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#86efac"/>
+        </marker>
+        <marker id="arrowY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#93c5fd"/>
+        </marker>
+      </defs>
+      <line x1="0" y1="0" x2="460" y2="0" stroke="#86efac" stroke-width="2" marker-end="url(#arrowX)"/>
+      <line x1="0" y1="0" x2="0" y2="-335" stroke="#93c5fd" stroke-width="2" marker-end="url(#arrowY)"/>
+
+      <!-- Labels axes -->
+      <text x="472" y="5" fill="#86efac" font-size="22" font-weight="bold" font-family="monospace">X</text>
+      <text x="-10" y="-340" fill="#93c5fd" font-size="22" font-weight="bold" font-family="monospace">Y</text>
+
+      <!-- ── Coordonnées clés ── -->
+      <!-- X labels -->
+      <text x="-368" y="280" fill="#94a3b8" font-size="16" text-anchor="middle" font-family="monospace">−0.92</text>
+      <text x="368" y="280" fill="#94a3b8" font-size="16" text-anchor="middle" font-family="monospace">+0.92</text>
+      <text x="-180" y="280" fill="#94a3b8" font-size="14" text-anchor="middle" font-family="monospace">−0.46</text>
+      <text x="180" y="280" fill="#94a3b8" font-size="14" text-anchor="middle" font-family="monospace">+0.46</text>
+      <!-- Y labels -->
+      <text x="-490" y="251" fill="#94a3b8" font-size="16" text-anchor="middle" font-family="monospace">−0.62</text>
+      <text x="-490" y="-237" fill="#94a3b8" font-size="16" text-anchor="middle" font-family="monospace">+0.62</text>
+      <text x="-490" y="5" fill="#94a3b8" font-size="16" text-anchor="middle" font-family="monospace">0</text>
+      <!-- Y buts -->
+      <text x="-490" y="-112" fill="#60a5fa" font-size="13" text-anchor="middle" font-family="monospace">+0.30</text>
+      <text x="-490" y="128" fill="#60a5fa" font-size="13" text-anchor="middle" font-family="monospace">−0.30</text>
+
+      <!-- ── Labels équipes ── -->
+      <text x="-280" y="-260" fill="#60a5fa" font-size="18" font-weight="bold" text-anchor="middle">BLEU</text>
+      <text x="-280" y="-240" fill="#60a5fa" font-size="13" text-anchor="middle">attaque →</text>
+      <text x="280" y="-260" fill="#4ade80" font-size="18" font-weight="bold" text-anchor="middle">VERT</text>
+      <text x="280" y="-240" fill="#4ade80" font-size="13" text-anchor="middle">← attaque</text>
+
+      <!-- ── Robots exemple ── -->
+      <!-- Robot vert 1 (attaquant) -->
+      <rect x="148" y="-20" width="40" height="40" rx="6" fill="#22c55e" opacity="0.9"/>
+      <text x="168" y="6" fill="white" font-size="18" text-anchor="middle" font-weight="bold">1</text>
+      <text x="168" y="56" fill="#4ade80" font-size="13" text-anchor="middle" font-family="monospace">(0.46, 0)</text>
+
+      <!-- Robot vert 2 (défenseur) -->
+      <rect x="288" y="-20" width="40" height="40" rx="6" fill="#16a34a" opacity="0.9"/>
+      <text x="308" y="6" fill="white" font-size="18" text-anchor="middle" font-weight="bold">2</text>
+      <text x="308" y="56" fill="#4ade80" font-size="13" text-anchor="middle" font-family="monospace">(0.80, 0)</text>
+
+      <!-- Robot bleu 1 -->
+      <rect x="-228" y="-20" width="40" height="40" rx="6" fill="#3b82f6" opacity="0.9"/>
+      <text x="-208" y="6" fill="white" font-size="18" text-anchor="middle" font-weight="bold">1</text>
+
+      <!-- Robot bleu 2 -->
+      <rect x="-348" y="-20" width="40" height="40" rx="6" fill="#1d4ed8" opacity="0.9"/>
+      <text x="-328" y="6" fill="white" font-size="18" text-anchor="middle" font-weight="bold">2</text>
+
+      <!-- Balle -->
+      <circle cx="20" cy="40" r="14" fill="#f97316"/>
+      <text x="20" y="75" fill="#f97316" font-size="14" text-anchor="middle" font-family="monospace">(0.05, 0.10)</text>
+
+      <!-- ── Légendes ── -->
+      <rect x="-460" y="296" width="920" height="2" fill="rgba(255,255,255,0.05)"/>
+      <circle cx="-380" cy="320" r="8" fill="#22c55e"/>
+      <text x="-365" y="326" fill="#94a3b8" font-size="14">Vert 1 / 2</text>
+      <circle cx="-270" cy="320" r="8" fill="#3b82f6"/>
+      <text x="-255" y="326" fill="#94a3b8" font-size="14">Bleu 1 / 2</text>
+      <circle cx="-160" cy="320" r="8" fill="#f97316"/>
+      <text x="-145" y="326" fill="#94a3b8" font-size="14">Balle</text>
+      <rect x="-50" y="312" width="16" height="16" fill="none" stroke="#4ade80" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="-28" y="326" fill="#94a3b8" font-size="14">Zone défense</text>
+      <rect x="130" y="312" width="16" height="16" fill="none" stroke="#4ade80" stroke-width="3"/>
+      <text x="152" y="326" fill="#94a3b8" font-size="14">But vert</text>
+      <rect x="240" y="312" width="16" height="16" fill="none" stroke="#60a5fa" stroke-width="3"/>
+      <text x="262" y="326" fill="#94a3b8" font-size="14">But bleu</text>
+    </svg>
+    <p class="field-caption">Le terrain RSK avec le système de coordonnées. L'origine (0,0) est au centre. Tout est en mètres.</p>
+  </div>
+
+  <div class="callout tip">
+    <p>Retiens les limites : <strong>X ∈ [−0.92, +0.92]</strong> et <strong>Y ∈ [−0.615, +0.615]</strong>.
+    Si tu envoies un robot en dehors de ces valeurs, il sortira du terrain !</p>
+  </div>
+
+  <!-- ──────────────────── 3. ZONES ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="zones">3. Les zones importantes</h2>
+
+  <p>Voici les positions-clés que tu retrouveras constamment dans le code :</p>
+
+  <table>
+    <thead><tr><th>Zone / Point</th><th>Coordonnées</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Centre</td><td><code>(0, 0)</code></td><td>Milieu du terrain, point de départ</td></tr>
+      <tr><td>But vert (droite)</td><td><code>x ≈ +0.92</code></td><td>But à défendre par l'équipe verte (config "vers-")</td></tr>
+      <tr><td>But bleu (gauche)</td><td><code>x ≈ −0.92</code></td><td>But à défendre par l'équipe bleue</td></tr>
+      <tr><td>Défenseur vert</td><td><code>(0.80, y_balle)</code></td><td>Position idéale devant le but vert</td></tr>
+      <tr><td>Zone centrale Y</td><td><code>y ∈ [−0.30, +0.30]</code></td><td>Zone dans la largeur du but</td></tr>
+      <tr><td>Zone danger droite</td><td><code>x ∈ [0.60, 0.92]</code></td><td>La balle menace le but vert</td></tr>
+      <tr><td>Points de dot</td><td><code>(±0.45, ±0.305)</code></td><td>Repères de placement</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> constantes_terrain.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+# Les constantes sont dans rsk.constants
+print(rsk.constants.field_length)    # 1.84 m
+print(rsk.constants.field_width)     # 1.23 m
+print(rsk.constants.goal_width)      # 0.60 m
+print(rsk.constants.defense_area_length)  # 0.30 m
+print(rsk.constants.defense_area_width)   # 0.90 m
+
+# Calculer les limites
+x_max = rsk.constants.field_length / 2    # 0.92
+y_max = rsk.constants.field_width  / 2    # 0.615
+print(f"X : [{-x_max:.2f}, {x_max:.2f}]")
+print(f"Y : [{-y_max:.3f}, {y_max:.3f}]")
+</code></pre>
+
+  <!-- ──────────────────── 4. ANGLES ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="angles">4. Angles &amp; radians</h2>
+
+  <p>
+    Les angles dans RSK sont exprimés en <strong>radians</strong>, pas en degrés.
+    Un tour complet = 2π ≈ 6.28 radians.
+  </p>
+
+  <!-- SVG Angles -->
+  <div class="field-container">
+    <svg viewBox="-280 -280 560 560" width="100%" style="max-width:400px;display:block;margin:0 auto;">
+      <!-- Cercle de référence -->
+      <circle cx="0" cy="0" r="220" fill="rgba(34,197,94,0.05)" stroke="var(--border)" stroke-width="1.5"/>
+      <!-- Croix -->
+      <line x1="-240" y1="0" x2="240" y2="0" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <line x1="0" y1="-240" x2="0" y2="240" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+      <!-- Robot au centre -->
+      <rect x="-24" y="-24" width="48" height="48" rx="8" fill="#22c55e"/>
+      <text x="0" y="8" fill="white" font-size="20" text-anchor="middle" font-weight="bold">⚙</text>
+
+      <!-- Flèches et labels -->
+      <!-- 0 rad = droite (+X) -->
+      <line x1="0" y1="0" x2="200" y2="0" stroke="#f97316" stroke-width="2.5"/>
+      <polygon points="200,0 186,-8 186,8" fill="#f97316"/>
+      <text x="210" y="6" fill="#f97316" font-size="16" font-weight="bold">0</text>
+      <text x="210" y="22" fill="#f97316" font-size="12">rad</text>
+      <text x="210" y="38" fill="#94a3b8" font-size="12">(droite)</text>
+
+      <!-- π rad = gauche (-X) -->
+      <line x1="0" y1="0" x2="-200" y2="0" stroke="#86efac" stroke-width="2.5"/>
+      <polygon points="-200,0 -186,-8 -186,8" fill="#86efac"/>
+      <text x="-270" y="6" fill="#86efac" font-size="16" font-weight="bold">π</text>
+      <text x="-270" y="22" fill="#86efac" font-size="12">rad</text>
+      <text x="-270" y="38" fill="#94a3b8" font-size="12">(gauche)</text>
+
+      <!-- π/2 rad = haut (+Y) -->
+      <line x1="0" y1="0" x2="0" y2="-200" stroke="#93c5fd" stroke-width="2.5"/>
+      <polygon points="0,-200 -8,-186 8,-186" fill="#93c5fd"/>
+      <text x="14" y="-200" fill="#93c5fd" font-size="15" font-weight="bold">π/2</text>
+      <text x="14" y="-185" fill="#94a3b8" font-size="12">(haut)</text>
+
+      <!-- -π/2 rad = bas (-Y) -->
+      <line x1="0" y1="0" x2="0" y2="200" stroke="#fbbf24" stroke-width="2.5"/>
+      <polygon points="0,200 -8,186 8,186" fill="#fbbf24"/>
+      <text x="14" y="197" fill="#fbbf24" font-size="15" font-weight="bold">-π/2</text>
+      <text x="14" y="215" fill="#94a3b8" font-size="12">(bas)</text>
+
+      <!-- Arc pour montrer la direction -->
+      <path d="M 60,0 A 60,60 0 0,0 0,-60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="50" y="-40" fill="#94a3b8" font-size="13">sens +</text>
+    </svg>
+    <p class="field-caption">Le sens positif des angles est le sens anti-horaire (mathématique).</p>
+  </div>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> angles.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import math
+from math import radians, pi
+
+# Les angles les plus utilisés dans RSK
+print(radians(0))       # 0.0   → regarde vers la droite (+X)
+print(radians(180))     # 3.14  → regarde vers la gauche (-X)  ← défenseur vert!
+print(radians(90))      # 1.57  → regarde vers le haut (+Y)
+print(radians(-90))     # -1.57 → regarde vers le bas (-Y)
+
+# Équivalents avec pi
+pi       # ≈ 3.14159 → regarde à gauche
+
+# Dans le code réel :
+from math import radians
+
+# Défenseur vert (but à droite → regarde à gauche)
+angle_defenseur = radians(180)
+
+# Défenseur vert (but à gauche → regarde à droite)
+angle_defenseur_gauche = radians(0)
+
+# Calcul de l'angle vers la balle (math.atan2 → jamais de division par zéro)
+xg1, yg1 = 0.46, 0.0     # position du robot
+xb, yb   = -0.3, 0.2      # position de la balle
+
+angle_vers_balle = math.atan2(yb - yg1, xb - xg1)
+# → L'angle à adopter pour que le robot regarde vers la balle
+</code></pre>
+
+  <div class="callout warning">
+    <p>Les robots RSK utilisent <code>math.atan(dy/dx)</code> dans les codes d'exemple,
+    mais cette forme peut produire une <strong>division par zéro</strong> si <code>dx == 0</code>.
+    Préfère toujours <code>math.atan2(dy, dx)</code> qui gère tous les cas !</p>
+  </div>
+
+  <!-- ──────────────────── 5. BALLE ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="balle">5. La balle</h2>
+
+  <p>
+    <code>client.ball</code> contient la position de la balle détectée par la caméra.
+    C'est un <strong>tuple <code>(x, y)</code></strong> en mètres, ou <code>None</code>
+    si la caméra ne la voit pas.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> balle.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        # ── Vérification obligatoire ! ─────────────────────
+        if client.ball is not None:
+            xball = client.ball[0]   # position X de la balle
+            yball = client.ball[1]   # position Y de la balle
+            print(f"Balle en ({xball:.3f}, {yball:.3f})")
+
+            # Balle dans la moitié gauche du terrain ?
+            if xball < 0:
+                print("La balle est dans la moitié bleue")
+            else:
+                print("La balle est dans la moitié verte")
+
+            # Balle en danger pour le but vert (à droite) ?
+            if xball > 0.60 and abs(yball) < 0.30:
+                print("⚠️ LA BALLE MENACE LE BUT VERT !")
+
+        else:
+            print("Balle non visible - attente...")
+</code></pre>
+
+  <!-- ──────────────────── 6. CÔTÉS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="cotes">6. Quelle équipe joue de quel côté ?</h2>
+
+  <p>
+    RSK peut se jouer dans les <strong>deux orientations</strong>. Il y a deux configurations
+    correspondant aux deux fichiers <code>green vers-.py</code> et <code>green vers+.py</code> :
+  </p>
+
+  <div class="two-col">
+    <div class="mini-card" style="border-left: 3px solid #22c55e;">
+      <div class="mini-card-title green">green vers− (vert attaque à gauche)</div>
+      <p style="font-size:0.875rem;color:var(--txt2);">
+        Le but à <strong>défendre</strong> par le vert est sur la <strong>droite (+X)</strong> du terrain.
+        Le défenseur se place à <code>x ≈ +0.80</code>, orienté à <code>radians(180)</code> (regarde à gauche).
+        L'attaquant pousse vers <code>x &lt; 0</code> (vers le but bleu).
+      </p>
+    </div>
+    <div class="mini-card" style="border-left: 3px solid #22c55e;">
+      <div class="mini-card-title green">green vers+ (vert attaque à droite)</div>
+      <p style="font-size:0.875rem;color:var(--txt2);">
+        Le but à <strong>défendre</strong> par le vert est sur la <strong>gauche (−X)</strong>.
+        Le défenseur se place à <code>x ≈ −0.80</code>, orienté à <code>radians(0)</code> (regarde à droite).
+        L'attaquant pousse vers <code>x &gt; 0</code> (vers le but bleu).
+      </p>
+    </div>
+  </div>
+
+  <div class="callout robot">
+    <p>L'arbitre RSK (ou l'organisateur du match) te dit avant la partie si tu joues
+    <em>"vert vers−"</em> ou <em>"vert vers+"</em>. Utilise le bon fichier en fonction de cette info !</p>
+  </div>
+
+  <!-- PAGE NAV -->
+  <div class="page-nav">
+    <a href="chapitre2.html" class="page-nav-btn">
+      <span class="nav-arrow">←</span>
+      <div>
+        <div class="nav-label">Précédent</div>
+        <div class="nav-title">Python : Objets &amp; Classes</div>
+      </div>
+    </a>
+    <span class="page-nav-spacer"></span>
+    <a href="chapitre4.html" class="page-nav-btn">
+      <div style="text-align:right;">
+        <div class="nav-label">Suivant</div>
+        <div class="nav-title">RSK : Contrôler les robots</div>
+      </div>
+      <span class="nav-arrow">→</span>
+    </a>
+  </div>
+
+</main>
+</div>
+
+<footer>
+  <span>RSK pour les nuls · Chapitre 3 — Le terrain</span>
+  <span><a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener">robot-soccer-kit.github.io</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="assets/script.js"></script>
+</body>
+</html>

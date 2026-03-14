@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapitre 1 – Python : Les bases | RSK pour les nuls</title>
+  <meta name="description" content="Apprenez les bases de Python : variables, conditions, boucles, fonctions. Tout ce qu'il faut pour programmer des robots RSK.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo">⚽</div>
+    RSK <span>pour les nuls</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="chapitre1.html" class="active">Python bases</a></li>
+    <li><a href="chapitre2.html">Python OOP</a></li>
+    <li><a href="chapitre3.html">Le terrain</a></li>
+    <li><a href="chapitre4.html">Les robots</a></li>
+    <li><a href="chapitre5.html">Tactiques</a></li>
+    <li><a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener" class="btn btn-outline" style="padding:5px 12px;font-size:0.82rem;">Docs RSK ↗</a></li>
+  </ul>
+  <button class="hamburger" aria-label="Menu">☰</button>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-title">Chapitres</div>
+    <a href="index.html" class="sidebar-link"><span class="num">0</span>Accueil</a>
+    <a href="chapitre1.html" class="sidebar-link active"><span class="num">1</span>Python : Les bases</a>
+    <div class="sidebar-sub">
+      <a href="#variables" class="sidebar-sub-link">Variables &amp; types</a>
+      <a href="#maths" class="sidebar-sub-link">Maths, max &amp; min</a>
+      <a href="#conditions" class="sidebar-sub-link">Conditions if/else</a>
+      <a href="#boucles" class="sidebar-sub-link">Boucles while</a>
+      <a href="#fonctions" class="sidebar-sub-link">Fonctions def</a>
+      <a href="#tuples" class="sidebar-sub-link">Tuples &amp; listes</a>
+      <a href="#imports" class="sidebar-sub-link">Imports</a>
+    </div>
+    <a href="chapitre2.html" class="sidebar-link"><span class="num">2</span>Python : Objets</a>
+    <a href="chapitre3.html" class="sidebar-link"><span class="num">3</span>RSK : Le terrain</a>
+    <a href="chapitre4.html" class="sidebar-link"><span class="num">4</span>RSK : Les robots</a>
+    <a href="chapitre5.html" class="sidebar-link"><span class="num">5</span>Tactiques</a>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <div class="page-header">
+    <div class="chapter-badge">📖 Chapitre 1</div>
+    <h1 class="page-title">Python : <span class="accent">Les bases</span></h1>
+    <p class="page-subtitle">
+      Variables, conditions, boucles, fonctions, maths — tout ce dont tu as besoin
+      pour comprendre et écrire tes premiers programmes RSK.
+    </p>
+  </div>
+
+  <!-- ──────────────────── 1. VARIABLES ──────────────────── -->
+  <h2 id="variables">1. Variables &amp; types de données</h2>
+
+  <p>
+    Une <strong>variable</strong>, c'est une boîte dans laquelle tu ranges une valeur.
+    En Python, tu n'as pas besoin de déclarer le type : Python le détecte tout seul.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> variables.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># Un entier (int)
+score = 3
+
+# Un nombre décimal (float)
+position_x = 0.45       # en mètres sur le terrain
+position_y = -0.25
+
+# Une chaîne de caractères (str)
+nom_equipe = "vert"
+
+# Un booléen (bool)
+balle_visible = True
+robot_arrive = False
+
+# Affichage
+print(score)            # 3
+print(position_x)       # 0.45
+print(nom_equipe)       # vert
+print(balle_visible)    # True
+</code></pre>
+
+  <div class="callout robot">
+    <p>Dans RSK, les positions des robots et de la balle sont des <strong>float</strong>
+    (nombres décimaux) exprimés en mètres. Par exemple, <code>0.45</code> signifie 45 centimètres.</p>
+  </div>
+
+  <h3>Les types à connaître</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Exemple</th><th>Utilisation RSK</th></tr></thead>
+    <tbody>
+      <tr><td>int</td><td><code>3</code>, <code>-1</code>, <code>255</code></td><td>Numéro de robot, score</td></tr>
+      <tr><td>float</td><td><code>0.45</code>, <code>-0.92</code></td><td>Positions x/y, angles en radians</td></tr>
+      <tr><td>bool</td><td><code>True</code>, <code>False</code></td><td>Robot arrivé à destination ?</td></tr>
+      <tr><td>str</td><td><code>"vert"</code>, <code>"blue"</code></td><td>Couleur d'équipe</td></tr>
+      <tr><td>None</td><td><code>None</code></td><td>Balle non détectée</td></tr>
+      <tr><td>tuple</td><td><code>(0.5, 0.2, 3.14)</code></td><td>Position (x, y, angle)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warning">
+    <p>En Python, <code>=</code> sert à <strong>affecter</strong> une valeur, et <code>==</code> sert à
+    <strong>comparer</strong>. Ne les confonds pas !</p>
+  </div>
+
+  <!-- ──────────────────── 2. MATHS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="maths">2. Opérations mathématiques</h2>
+
+  <p>Python permet de faire des calculs directement. Pour les fonctions avancées (racine carrée,
+  trigonométrie, etc.) on importe le module <code>math</code>.</p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> maths.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import math
+
+# Opérations de base
+a = 10 + 3     # addition       → 13
+b = 10 - 3     # soustraction   → 7
+c = 10 * 3     # multiplication → 30
+d = 10 / 3     # division       → 3.333...
+e = 10 // 3    # division entière → 3
+f = 10 % 3     # modulo (reste)  → 1
+g = 2 ** 8     # puissance       → 256
+
+# Module math
+print(math.sqrt(9))         # racine carrée → 3.0
+print(math.pi)              # π ≈ 3.14159
+print(math.radians(180))    # 180° en radians → 3.14159
+print(math.degrees(math.pi))# π radians en degrés → 180.0
+print(math.atan(1))         # arc tangente → 0.785 rad (45°)
+
+# Valeur absolue (sans math)
+print(abs(-5))              # → 5
+</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Pourquoi les radians ?</strong> RSK utilise des radians pour les angles.
+    <code>0</code> = regarde vers la droite, <code>math.pi</code> (≈3.14) = regarde vers la gauche.
+    Pour convertir des degrés en radians : <code>from math import radians</code> puis <code>radians(180)</code>.</p>
+  </div>
+
+  <h3>Distance entre deux points</h3>
+  <p>Une formule que tu utiliseras souvent pour calculer la distance entre un robot et la balle :</p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> distance.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import math
+
+# Position du robot
+rx, ry = 0.5, 0.2
+
+# Position de la balle
+bx, by = -0.3, 0.1
+
+# Distance euclidienne
+distance = math.sqrt((bx - rx)**2 + (by - ry)**2)
+print(f"Distance robot→balle : {distance:.2f} m")
+# → Distance robot→balle : 0.81 m
+
+# Avec math.hypot (plus court)
+distance = math.hypot(bx - rx, by - ry)
+</code></pre>
+
+  <h3><code>max()</code> et <code>min()</code> — borner une valeur</h3>
+  <p>
+    <code>max(a, b)</code> renvoie le plus grand des deux, <code>min(a, b)</code> le plus petit.
+    Ces fonctions sont <strong>intégrées à Python</strong> (pas besoin d'importer quoi que ce soit)
+    et sont très utiles pour limiter une coordonnée à un intervalle.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> max_min.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># max : renvoie le plus grand
+print(max(3, 7))       # → 7
+print(max(-1, 0))      # → 0
+
+# min : renvoie le plus petit
+print(min(3, 7))       # → 3
+print(min(-1, 0))      # → -1
+
+# Cas classique RSK : limiter le Y d'un défenseur entre -0.30 et +0.30
+by = 0.45   # la balle est loin sur le côté
+
+by_clamp = max(-0.30, min(0.30, by))
+# min(0.30, 0.45) → 0.30  (on coupe au plafond)
+# max(-0.30, 0.30) → 0.30  (déjà dans la plage)
+print(by_clamp)        # → 0.3
+
+# Avec une valeur négative
+by = -0.80
+by_clamp = max(-0.30, min(0.30, by))
+# min(0.30, -0.80) → -0.80
+# max(-0.30, -0.80) → -0.30  (on coupe au plancher)
+print(by_clamp)        # → -0.3
+</code></pre>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">💡 Le « clamp » — patron universel</div>
+    <p>
+      <code>max(mini, min(maxi, valeur))</code> est la façon standard de
+      <strong>bloquer une valeur dans un intervalle</strong>. On l'appelle <em>clamp</em> en anglais.
+      Dans RSK tu verras souvent ce motif pour empêcher un robot de sortir du terrain ou de
+      dépasser la zone de but.
+    </p>
+  </div>
+
+  <!-- ──────────────────── 3. CONDITIONS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="conditions">3. Conditions : if / elif / else</h2>
+
+  <p>
+    Les conditions permettent à ton programme de <strong>décider</strong> quoi faire selon
+    la situation. C'est le cœur de la logique de tes robots !
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> conditions.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">y_balle = 0.40   # position Y de la balle
+
+# Structure if / elif / else
+if y_balle > 0.30:
+    print("La balle est au-dessus de la zone")
+elif y_balle < -0.30:
+    print("La balle est en-dessous de la zone")
+else:
+    print("La balle est dans la zone centrale")
+
+# Opérateurs de comparaison
+# >   plus grand que
+# <   plus petit que
+# >=  plus grand ou égal
+# <=  plus petit ou égal
+# ==  égal
+# !=  différent
+
+# Opérateurs logiques
+x = 0.70
+y = 0.10
+if x > 0.60 and x < 0.92:
+    print("Le robot est devant son but !")
+
+if y > 0.30 or y < -0.30:
+    print("La balle est hors de la zone centrale")
+
+# Vérifier si la balle existe
+balle = None   # ou (0.5, 0.2) si détectée
+
+if balle is not None:
+    print(f"Balle à ({balle[0]}, {balle[1]})")
+else:
+    print("Balle non détectée")
+</code></pre>
+
+  <div class="callout robot">
+    <p>Dans RSK, <code>client.ball</code> vaut <code>None</code> quand la caméra ne voit pas la balle.
+    Toujours vérifier <code>if client.ball is not None:</code> avant d'utiliser <code>client.ball[0]</code> !</p>
+  </div>
+
+  <h3>Les conditions imbriquées</h3>
+  <p>Tu peux mettre des <code>if</code> dans des <code>if</code> — c'est ce qu'on voit dans le code
+  du défenseur RSK :</p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> conditions_imbriquees.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">xball = 0.75
+yball = 0.10
+
+if yball > -0.30 and yball < 0.30:
+    # La balle est dans la zone centrale (Y)
+    if xball > 0.60 and xball < 0.92:
+        # ET la balle est près du but
+        print("Danger ! Le défenseur doit tirer !")
+    else:
+        print("Balle au centre - revenir en position")
+else:
+    # Balle en dehors : aller au coin le plus proche
+    if yball >= 0.30:
+        print("Aller à (0.80, 0.30)")
+    else:
+        print("Aller à (0.80, -0.30)")
+</code></pre>
+
+  <!-- ──────────────────── 4. BOUCLES ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="boucles">4. Boucles : while &amp; for</h2>
+
+  <h3>La boucle while — essentielle pour les robots</h3>
+  <p>
+    Tous les programmes RSK utilisent <code>while True:</code> pour tourner en permanence.
+    Le robot répète ses commandes en boucle, environ des dizaines de fois par seconde.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> while.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># while True : boucle infinie (le robot travaille sans s'arrêter)
+# ⚡ C'est la structure de BASE de tout programme RSK !
+
+import rsk
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:          # ← répète INDÉFINIMENT
+        if client.ball is not None:
+            bx = client.ball[0]
+            by = client.ball[1]
+            # Le robot suit la balle en permanence
+            client.green1.goto((bx + 0.08, by, radians(180)), wait=False)
+</code></pre>
+
+  <div class="callout info">
+    <p>Le paramètre <code>wait=False</code> est crucial dans la boucle <code>while True</code>.
+    Sans lui, le programme se bloquerait jusqu'à ce que le robot arrive à destination,
+    et ne pourrait plus réagir si la balle bouge !</p>
+  </div>
+
+  <h3>while avec condition</h3>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> while_condition.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">compteur = 0
+while compteur < 5:
+    print(f"Tour numéro {compteur}")
+    compteur += 1    # compteur = compteur + 1
+# Affiche : Tour numéro 0, 1, 2, 3, 4
+
+# break : sortir de la boucle immédiatement
+x = 0
+while True:
+    x += 1
+    if x >= 10:
+        break    # on sort de la boucle
+print(f"x vaut {x}")  # x vaut 10
+
+# continue : passer à l'itération suivante
+for i in range(10):
+    if i % 2 == 0:
+        continue    # on saute les nombres pairs
+    print(i)        # affiche : 1, 3, 5, 7, 9
+</code></pre>
+
+  <h3>La boucle for</h3>
+  <p>Moins utilisée dans RSK mais utile pour parcourir des listes :</p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> for.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># range(n) génère les entiers de 0 à n-1
+for i in range(5):
+    print(i)    # 0, 1, 2, 3, 4
+
+# Parcourir une liste de positions
+waypoints = [(0.3, 0.0), (0.0, 0.3), (-0.3, 0.0)]
+for (x, y) in waypoints:
+    print(f"Point ({x}, {y})")
+</code></pre>
+
+  <!-- ──────────────────── 5. FONCTIONS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="fonctions">5. Fonctions : def</h2>
+
+  <p>
+    Une <strong>fonction</strong> est un bloc de code réutilisable. Tu lui donnes un nom, des
+    <em>paramètres</em> (les données en entrée) et elle peut <em>retourner</em> un résultat.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> fonctions.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import math
+
+# ── Définition d'une fonction ──────────────────────────────
+def distance(x1, y1, x2, y2):
+    """Calcule la distance entre deux points."""
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+# ── Appel ──────────────────────────────────────────────────
+d = distance(0.0, 0.0, 0.3, 0.4)
+print(d)    # → 0.5
+
+# ── Paramètres par défaut ──────────────────────────────────
+def goto(x, y, angle=0):
+    """Va à (x, y) avec l'angle donné (0 par défaut)."""
+    print(f"Aller à ({x}, {y}) avec angle {angle}")
+
+goto(0.5, 0.2)          # angle = 0 (par défaut)
+goto(0.5, 0.2, 3.14)    # angle = π
+
+# ── Fonction sans return ───────────────────────────────────
+def afficher_balle(x, y):
+    if x is None:
+        print("Balle non visible")
+    else:
+        print(f"Balle en ({x:.2f}, {y:.2f})")
+
+afficher_balle(0.45, -0.20)   # Balle en (0.45, -0.20)
+</code></pre>
+
+  <h3>Les fonctions dans RSK</h3>
+  <p>
+    Dans le code des équipes, on organise le comportement en <strong>deux fonctions</strong> :
+    une pour le défenseur, une pour l'attaquant.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> structure_rsk.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python">import rsk
+from math import radians
+
+def Defenseur(xball, yball):
+    """Le robot 2 (vert) défend son but."""
+    if yball < 0.30 and yball > -0.30:
+        # La balle est dans la zone → se positionner
+        client.green2.goto((0.80, yball, radians(180)), wait=False)
+    elif yball >= 0.30:
+        client.green2.goto((0.80, 0.30, radians(180)))
+    else:
+        client.green2.goto((0.80, -0.30, radians(180)))
+
+def Attaquant(xball, yball):
+    """Le robot 1 (vert) attaque."""
+    client.green1.goto((xball + 0.05, yball, radians(180)), wait=False)
+    client.green1.kick()
+
+# Boucle principale
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        if client.ball is not None:
+            xball = client.ball[0]
+            yball = client.ball[1]
+            Defenseur(xball, yball)
+            Attaquant(xball, yball)
+</code></pre>
+
+  <div class="callout warning">
+    <p>Attention à l'<strong>indentation</strong> (les espaces en début de ligne) !
+    En Python, c'est obligatoire. 4 espaces (ou 1 tabulation) pour chaque niveau.
+    Une erreur de niveau = ton programme ne fonctionne plus.</p>
+  </div>
+
+  <!-- ──────────────────── 6. TUPLES ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="tuples">6. Tuples &amp; listes</h2>
+
+  <h3>Le tuple — le format de position RSK</h3>
+  <p>
+    Un <strong>tuple</strong> est une séquence immuable de valeurs entre parenthèses.
+    Dans RSK, les positions sont des tuples <code>(x, y, angle)</code>.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> tuples.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># Créer un tuple
+position = (0.46, 0.0, 3.14)
+
+# Accéder aux éléments (index commence à 0)
+x     = position[0]    # 0.46
+y     = position[1]    # 0.0
+angle = position[2]    # 3.14
+
+# Décomposer (unpacking)
+x, y, angle = position
+
+# Tuple à 2 éléments (balle)
+balle = (0.30, -0.15)
+bx = balle[0]    # x de la balle
+by = balle[1]    # y de la balle
+
+# client.ball est un tuple (x, y) ou None
+# client.green1.position est un tuple (x, y)
+# client.green1.pose     est un tuple (x, y, angle)
+</code></pre>
+
+  <h3>Les listes</h3>
+  <p>Une <strong>liste</strong> est une séquence modifiable entre crochets :</p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> listes.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># Créer
+robots = ["green1", "green2"]
+scores = [0, 0]
+
+# Modifier
+scores[0] = 3         # scores = [3, 0]
+scores.append(5)      # scores = [3, 0, 5]
+
+# Longueur
+print(len(robots))    # 2
+
+# Parcourir
+for robot in robots:
+    print(robot)
+</code></pre>
+
+  <!-- ──────────────────── 7. IMPORTS ──────────────────── -->
+  <hr class="section-div">
+  <h2 id="imports">7. Imports</h2>
+
+  <p>
+    Python est livré avec des <strong>modules</strong> qu'on peut importer pour avoir plus de
+    fonctionnalités. Pour RSK, tu en as trois principaux.
+  </p>
+
+  <div class="code-header">
+    <div class="code-label"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div> imports.py</div>
+    <button class="copy-btn">Copier</button>
+  </div>
+  <pre><code class="language-python"># ── Importer tout un module ──────────────────────────────
+import math
+import rsk
+
+angle = math.radians(180)    # préfixe obligatoire
+
+# ── Importer une fonction précise ────────────────────────
+from math import radians, atan, sqrt, pi
+
+angle = radians(180)         # pas besoin de math. devant
+
+# ── Les trois modules utilisés dans RSK ──────────────────
+import rsk              # la bibliothèque Robot Soccer Kit
+import math             # fonctions mathématiques (atan, sqrt, pi...)
+from math import radians# raccourci pratique pour les angles
+
+# ── Exemple complet ──────────────────────────────────────
+import rsk
+import math
+from math import radians
+
+with rsk.Client(host='localhost', key='') as client:
+    while True:
+        if client.ball is not None:
+            xball = client.ball[0]
+            yball = client.ball[1]
+            xg1   = client.green1.position[0]
+            yg1   = client.green1.position[1]
+            # math.atan calcule l'angle vers la balle
+            angle = math.atan2(yball - yg1, xball - xg1)
+</code></pre>
+
+  <div class="callout tip">
+    <p>Préfère <code>math.atan2(dy, dx)</code> à <code>math.atan(dy/dx)</code> pour éviter
+    la <strong>division par zéro</strong> quand le robot est exactement sur la même abscisse que la balle !</p>
+  </div>
+
+  <!-- PAGE NAV -->
+  <div class="page-nav">
+    <a href="index.html" class="page-nav-btn">
+      <span class="nav-arrow">←</span>
+      <div>
+        <div class="nav-label">Précédent</div>
+        <div class="nav-title">Accueil</div>
+      </div>
+    </a>
+    <span class="page-nav-spacer"></span>
+    <a href="chapitre2.html" class="page-nav-btn">
+      <div style="text-align:right;">
+        <div class="nav-label">Suivant</div>
+        <div class="nav-title">Python : Objets &amp; Classes</div>
+      </div>
+      <span class="nav-arrow">→</span>
+    </a>
+  </div>
+
+</main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>RSK pour les nuls · Chapitre 1 — Python bases</span>
+  <span>
+    <a href="https://robot-soccer-kit.github.io" target="_blank" rel="noopener">robot-soccer-kit.github.io</a>
+  </span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="assets/script.js"></script>
+</body>
+</html>
